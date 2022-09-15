@@ -58,3 +58,8 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
+AirMeetMultiplayer/Library/
+AirMeetMultiplayer/Logs/
+AirMeetMultiplayer/Packages/packages-lock.json
+AirMeetMultiplayer/Temp/
+AirMeetMultiplayer/UserSettings/EditorUserSettings.asset
