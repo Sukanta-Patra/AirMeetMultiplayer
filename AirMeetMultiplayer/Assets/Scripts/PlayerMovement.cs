@@ -38,8 +38,9 @@ public class PlayerMovement : NetworkBehaviour
         if (!IsOwner)
         {
             gameObject.GetComponent<PlayerMovement>().enabled = false;
-            Destroy(playerCamera);
+            Destroy(playerCamera.gameObject);
         }
+
     }
 
     void Start()
@@ -50,7 +51,9 @@ public class PlayerMovement : NetworkBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-        
+        leftJoystick = FindObjectOfType<GameManager>().leftJoystick;
+        rightJoystick = FindObjectOfType<GameManager>().rightJoystick;
+
     }
 
     void Update()
@@ -63,10 +66,12 @@ public class PlayerMovement : NetworkBehaviour
         float curSpeedX = canMove ? (isRunning ? runningSpeed : walkingSpeed) * Input.GetAxis("Vertical") : 0;
         float curSpeedY = canMove ? (isRunning ? runningSpeed : walkingSpeed) * Input.GetAxis("Horizontal") : 0;
         float movementDirectionY = moveDirection.y;
+
+#if !UNITY_ANDROID
         moveDirection = (forward * curSpeedX) + (right * curSpeedY);
-
+#else
         moveDirection = (forward * rightJoystick.GetInputDirection().y * runningSpeed) + (right * rightJoystick.GetInputDirection().x * runningSpeed);
-
+#endif
 
         if (Input.GetButton("Jump") && canMove && characterController.isGrounded)
         {
@@ -105,15 +110,17 @@ public class PlayerMovement : NetworkBehaviour
         // Player and Camera rotation
         if (canMove)
         {
+#if !UNITY_ANDROID
+            rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
+            rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
+            playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
+            transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
+#else
             rotationX += -leftJoystick.GetInputDirection().y * lookSpeed;
             rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
             playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
-            transform.rotation *= Quaternion.Euler(0, leftJoystick.GetInputDirection().x * lookSpeed, 0); 
-
-            /*rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
-            rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
-            playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
-            transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);*/
+            transform.rotation *= Quaternion.Euler(0, leftJoystick.GetInputDirection().x * lookSpeed, 0);
+#endif
         }
     }
 
