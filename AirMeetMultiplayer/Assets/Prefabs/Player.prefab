@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 2126390962753419856}
   - component: {fileID: 6150283331210551448}
   - component: {fileID: 443791774}
+  - component: {fileID: 3727337354007076617}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -125,6 +126,8 @@ MonoBehaviour:
   playerCamera: {fileID: 2126390963929801860}
   lookSpeed: 2
   lookXLimit: 45
+  leftJoystick: {fileID: 0}
+  rightJoystick: {fileID: 0}
   canMove: 1
 --- !u!82 &6150283331210551448
 AudioSource:
@@ -238,6 +241,32 @@ MonoBehaviour:
   AlwaysReplicateAsRoot: 0
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &3727337354007076617
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2126390962753419861}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df2868252ab5c4d1da357e8f11f1b524, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SyncPositionX: 1
+  SyncPositionY: 0
+  SyncPositionZ: 1
+  SyncRotAngleX: 0
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 0
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  InLocalSpace: 0
+  Interpolate: 1
 --- !u!1 &2126390963602051595
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : NetworkBehaviour
 {
     private CharacterController controller;
     private Vector3 playerVelocity;
@@ -25,19 +26,20 @@ public class PlayerMovement : MonoBehaviour
     Vector3 moveDirection = Vector3.zero;
     float rotationX = 0;
 
+    [SerializeField] private LeftJoystick leftJoystick;
+    [SerializeField] private RightJoystick rightJoystick;
+
     [HideInInspector]
     public bool canMove = true;
 
 
-    private void Awake()
+    public override void OnNetworkSpawn()
     {
-        //Disable other people cameras
-        Camera[] cameras = FindObjectsOfType<Camera>();
-
-        foreach (Camera cam in cameras)
-            cam.gameObject.SetActive(false);
-        //Activvet own camera
-        ActivateSelfCamera();
+        if (!IsOwner)
+        {
+            gameObject.GetComponent<PlayerMovement>().enabled = false;
+            Destroy(playerCamera);
+        }
     }
 
     void Start()
@@ -63,6 +65,9 @@ public class PlayerMovement : MonoBehaviour
         float movementDirectionY = moveDirection.y;
         moveDirection = (forward * curSpeedX) + (right * curSpeedY);
 
+        moveDirection = (forward * rightJoystick.GetInputDirection().y * runningSpeed) + (right * rightJoystick.GetInputDirection().x * runningSpeed);
+
+
         if (Input.GetButton("Jump") && canMove && characterController.isGrounded)
         {
             moveDirection.y = jumpSpeed;
@@ -83,13 +88,32 @@ public class PlayerMovement : MonoBehaviour
         // Move the controller
         characterController.Move(moveDirection * Time.deltaTime);
 
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            canMove = false;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        else if (Input.GetKeyDown(KeyCode.K))
+        { 
+            canMove = true;
+
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+
         // Player and Camera rotation
         if (canMove)
         {
-            rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
+            rotationX += -leftJoystick.GetInputDirection().y * lookSpeed;
             rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
             playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
-            transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
+            transform.rotation *= Quaternion.Euler(0, leftJoystick.GetInputDirection().x * lookSpeed, 0); 
+
+            /*rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
+            rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
+            playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
+            transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);*/
         }
     }
 
